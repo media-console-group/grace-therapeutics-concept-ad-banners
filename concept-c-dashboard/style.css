@@ -1,0 +1,588 @@
+/* ── Brand tokens: the ONLY place colors are defined. Values are the
+   Grace IR concept site's own :root (oklch), see .tmp/brand.json. The
+   site's rule carries over: the two bright hues (indigo, teal) are
+   FILLS ONLY on dark; text uses the -lt tints, buttons the -ink tone.
+   (color-mix / oklch: Chrome 111+ / Safari 16.2+) ── */
+:root {
+  --dark:        oklch(0.205 0.048 259);   /* site --deep-3 */
+  --dark-2:      color-mix(in srgb, var(--dark) 70%, black);
+  --navy:        oklch(0.331 0.080 259);   /* site --deep: the wordmark navy #1b355e */
+  --navy-2:      oklch(0.265 0.065 259);   /* site --deep-2 */
+  --navy-3:      oklch(0.215 0.055 262);   /* .fill-sweep end stop */
+  --accent:      oklch(0.542 0.181 274);   /* indigo #525fd6: sweep start, fills only */
+  --accent-d:    color-mix(in srgb, var(--accent) 82%, black);
+  --accent-lt:   oklch(0.78 0.150 274);    /* site --accent-lt: readable indigo on dark */
+  --accent-ink:  oklch(0.46 0.190 274);    /* site --accent-ink #3d43bf: CTA fill, white 7.6:1 */
+  --accent-ink-d:oklch(0.40 0.170 274);    /* site --accent-ink-d: CTA hover */
+  --gold:        oklch(0.672 0.111 205);   /* teal #16a9b6: sweep end, fills only */
+  --gold-d:      color-mix(in srgb, var(--gold) 85%, black);
+  --teal-lt:     oklch(0.80 0.105 205);    /* site --teal-lt: eyebrows + labels on dark */
+  --teal-hi:     oklch(0.85 0.090 205);    /* teal-lt lifted, for the eyebrow on the indigo glow */
+  --white:       #ffffff;
+  --text-hi:     oklch(0.88 0.016 259);    /* site lead text on dark */
+  --text-mid:    oklch(0.84 0.030 205);    /* site .motif-cap (0.80), one step lighter for 7px text on the glow */
+  --text-lo:     oklch(0.80 0.030 205);    /* site .motif-note (0.76), likewise */
+  --line-d:      oklch(0.98 0.02 259 / 0.16);  /* site --line-d */
+  --dot:         oklch(0.98 0.02 259 / 0.28);
+  --dose:        oklch(0.98 0.02 259 / 0.34);  /* site .motif-dose */
+  --dose-hi:     oklch(0.98 0.02 259 / 0.95);
+  --dose-lo:     oklch(0.98 0.02 259 / 0.15);
+  --track-lo:    oklch(0.98 0.02 259 / 0.13);
+  --halo:        oklch(0.672 0.111 205 / 0.35); /* site .motif-pulse halo */
+  --glow-i:      oklch(0.542 0.181 274 / 0.50); /* .fill-sweep indigo glow (site .55, eased for small text) */
+  --glow-t:      oklch(0.672 0.111 205 / 0.42); /* .fill-sweep teal glow */
+  --cta-ink:     var(--white);             /* white on --accent-ink passes 7.6:1 */
+  --font-head:   'Instrument Serif', 'Times New Roman', Times, serif;   /* Times is closer to Instrument's width than Georgia */
+  --font:        'Manrope', system-ui, sans-serif;
+  --mono:        'Spline Sans Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  --ease:        cubic-bezier(0.16,1,0.3,1);
+  --ease-io:     cubic-bezier(0.45,0,0.25,1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:300px; height:600px; overflow:hidden; background:var(--dark); }
+body { font-family:var(--font); -webkit-font-smoothing:antialiased; font-variant-numeric:lining-nums; }
+a { text-decoration:none; color:inherit; }
+button { border:0; background:none; font:inherit; color:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+
+/* ── Canvas ─────────────────────────────────────────────────────────
+   Fixed 300x600 stage on the IR site's .fill-sweep: an indigo glow top
+   left, a teal glow bottom right, over the navy gradient. It sits on the
+   stage (not on each slide) so the crossfade never dips. Persistent
+   chrome (logo, nav, stats, CTA) is pinned on top and never rotates. */
+#banner {
+  position:relative;
+  width:300px;
+  height:600px;
+  overflow:hidden;
+  cursor:pointer;
+  background-color:var(--navy);
+  background-image:
+    radial-gradient(120% 70% at 12% 6%, var(--glow-i), transparent 62%),
+    radial-gradient(110% 60% at 92% 97%, var(--glow-t), transparent 60%),
+    linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 58%, var(--navy-3) 100%);
+  background-repeat:no-repeat;
+}
+
+/* ── Slide stack ────────────────────────────────────────────────── */
+#slides { position:absolute; inset:0; z-index:1; }
+
+.slide {
+  position:absolute;
+  inset:0;
+  opacity:0;
+  z-index:1;
+  pointer-events:none;
+  transition:opacity 0.9s ease;
+}
+.slide.active { opacity:1; z-index:2; pointer-events:auto; }
+
+/* Motif layer: the slide art, kept in the upper area (y ~85-230),
+   between the top bar and the stat chip, x 48-252 clear of the arrows. */
+.slide-bg {
+  position:absolute;
+  inset:0;
+  z-index:1;
+  overflow:hidden;
+  user-select:none;
+}
+.motif {
+  position:absolute;
+  top:0; left:0;
+  width:300px; height:300px;
+  overflow:visible;
+}
+
+/* One shape language across all four variants (the site's .motif-*):
+   white dose squares, a 6px rounded track in the indigo-to-teal sweep,
+   a white pulse with a teal halo, mono uppercase captions. */
+.motif text { font-family:var(--mono); }
+.motif .cap  { font-size:7px; font-weight:500; letter-spacing:.12em; fill:var(--text-mid); }
+.motif .cap-b { fill:var(--white); }
+.motif .cap-t { fill:var(--teal-lt); }
+.motif .note { font-size:7px; font-weight:400; letter-spacing:.06em; fill:var(--text-lo); }
+.motif .num  { font-family:var(--font-head); font-size:21px; fill:var(--white); }
+.motif .num-lo { fill:var(--text-mid); }
+.motif .stop-i { stop-color:var(--accent); }
+.motif .stop-t { stop-color:var(--gold); }
+.motif .track-lo { fill:var(--track-lo); }
+.motif .halo { fill:var(--halo); }
+.motif .dot-core { fill:var(--white); }
+
+/* Slide 1 · 126 doses tick by one at a time, day by day (column by
+   column), while the pulse glides the one unbroken line beneath. */
+.motif .doses rect { fill:var(--dose); }
+.slide.active .motif .doses rect {
+  animation:dose-tick 4.5s linear infinite;
+  animation-delay:calc(var(--i) * 28ms);
+}
+@keyframes dose-tick {
+  0%   { fill:var(--dose-hi); }
+  7%   { fill:var(--dose); }
+  100% { fill:var(--dose); }
+}
+.slide.active .motif .run-line { animation:run-line 4.5s linear infinite; }
+@keyframes run-line {
+  0%   { transform:translateX(-196px); opacity:0; }
+  4%   { opacity:1; }
+  79%  { transform:translateX(0); opacity:1; }
+  94%  { transform:translateX(0); opacity:1; }
+  100% { transform:translateX(0); opacity:0; }
+}
+
+/* Slide 2 · dose intensity, proportional: one track width = 100% of an
+   arm. Oral in dose squares (1 = 4%), GTx-104 as the sweep track. */
+.motif .units .u { fill:var(--dose-lo); }
+.motif .units .u.on { fill:var(--dose-hi); }
+.slide.active .motif .units .u.on { animation:unit-on .5s var(--ease) .3s both; }
+.slide.active .motif .units .u.on + .u.on { animation-delay:.42s; }
+@keyframes unit-on { from { fill:var(--dose-lo); } to { fill:var(--dose-hi); } }
+.slide.active .motif .grow-x { animation:grow-x 1.3s var(--ease) .25s both; }
+@keyframes grow-x { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0 0 0 0); } }
+.slide.active .motif .run-54 { animation:run-54 1.3s var(--ease) .25s both; }
+@keyframes run-54 {
+  from { transform:translateX(-110px); opacity:0; }
+  15%  { opacity:1; }
+  to   { transform:none; opacity:1; }
+}
+
+/* Slide 3 · micelles: surfactant heads (teal) ring a nimodipine dose
+   square; the ring turns slowly and small micelles ride the line. */
+.motif .heads circle { fill:var(--gold); }
+.motif .tails { fill:none; stroke:var(--accent-lt); stroke-width:1.1; stroke-linecap:round; opacity:.85; }
+.motif .core { fill:var(--dose-hi); }
+.motif .spin { transform-box:view-box; transform-origin:88px 144px; animation:spin 30s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.motif .leader { fill:none; stroke:var(--text-lo); stroke-width:.8; stroke-linecap:round; opacity:.75; }
+.motif .bead { opacity:0; animation:bead 4s linear infinite; }
+/* each bead is a mini micelle: a dashed teal ring of heads round a white dose core */
+.motif .bead-ring { fill:var(--navy-2); stroke:var(--gold); stroke-width:1.7; stroke-dasharray:1.3 1.34; }
+.motif .bead rect { fill:var(--white); }
+.motif .bead:nth-child(2) { animation-delay:1s; }
+.motif .bead:nth-child(3) { animation-delay:2s; }
+.motif .bead:nth-child(4) { animation-delay:3s; }
+@keyframes bead {
+  0%   { transform:translateX(0); opacity:0; }
+  8%   { opacity:1; }
+  84%  { opacity:1; }
+  92%  { transform:translateX(184px); opacity:0; }
+  100% { transform:translateX(184px); opacity:0; }
+}
+
+/* Slide 4 · milestone rail: the infusion line runs through what has
+   happened and stops at the latest step; resubmission is the open ring. */
+.motif .rail-next { fill:none; stroke:var(--teal-lt); stroke-width:1.6; stroke-dasharray:2 3.4; stroke-linecap:round; opacity:.8; }
+.motif .step-done circle { fill:var(--white); }
+.motif .step-next { fill:var(--navy-2); stroke:var(--teal-lt); stroke-width:1.5; }
+.motif .ping {
+  fill:none; stroke:var(--teal-lt); stroke-width:1.2; opacity:0;
+  transform-box:fill-box; transform-origin:center;
+  animation:ping 2.4s ease-out infinite;
+}
+@keyframes ping {
+  0%   { transform:scale(1); opacity:.85; }
+  100% { transform:scale(3.1); opacity:0; }
+}
+.slide.active .motif .grow-y { animation:grow-y 1.5s var(--ease-io) .2s both; }
+@keyframes grow-y { from { clip-path:inset(0 0 100% 0); } to { clip-path:inset(0 0 0 0); } }
+.slide.active .motif .run-rail { animation:run-rail 1.5s var(--ease-io) .2s both; }
+@keyframes run-rail { from { transform:translateY(-78px); } to { transform:none; } }
+
+/* Inactive slides stop their ambient loops (saves CPU while hidden) */
+.slide:not(.active) .motif * { animation-play-state:paused; }
+
+.slide-copy {
+  position:absolute;
+  inset:0;
+  z-index:3;
+  transform:translateY(12px);
+  transition:transform 0.9s var(--ease);
+}
+.slide.active .slide-copy { transform:translateY(0); }
+
+/* Floating stat chip (per slide); its edge bar is the brand sweep */
+.mid-chip {
+  position:absolute;
+  top:258px; left:18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 14px 8px 13px;
+  background:color-mix(in srgb, var(--dark) 62%, transparent);
+  border-radius:0 6px 6px 0;
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+.mid-chip::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:3px;
+  background:linear-gradient(180deg, var(--accent), var(--gold));
+}
+.chip-num {
+  font-family:var(--font-head);
+  font-weight:400;
+  font-size:31px;
+  line-height:.92;
+  color:var(--white);
+  white-space:nowrap;
+}
+.chip-num em { font-style:normal; color:var(--accent-lt); }
+.chip-label {
+  font-family:var(--font);
+  font-size:8.6px;
+  line-height:1.32;
+  font-weight:600;
+  color:var(--text-hi);
+}
+
+/* Rotating headline block, pinned above the fixed bottom block */
+.copy-bottom {
+  position:absolute;
+  left:0; right:0;
+  bottom:150px;
+  padding:0 18px;
+}
+.kicker {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-family:var(--mono);
+  font-weight:500;
+  font-size:7.6px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--teal-lt);
+  margin-bottom:8px;
+}
+.kicker::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--gold); flex:none; }
+.copy-bottom h1 {
+  font-family:var(--font-head);
+  font-weight:400;
+  font-size:27px;
+  line-height:1.0;
+  letter-spacing:-0.005em;
+  color:var(--white);
+}
+.copy-bottom h1 em { font-style:italic; color:var(--accent-lt); }
+.copy-bottom p {
+  margin-top:8px;
+  font-size:10.5px;
+  line-height:1.4;
+  font-weight:500;
+  color:var(--text-hi);
+}
+
+/* ── Persistent chrome (never rotates) ─────────────────────────── */
+#top-bar {
+  position:absolute;
+  top:0; left:0; right:0;
+  z-index:5;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:15px 18px 0;
+}
+#logo { display:flex; align-items:center; }
+#logo .lockup { display:block; height:24px; width:auto; flex:none; }
+#eyebrow {
+  font-family:var(--mono);
+  font-weight:500;
+  font-size:7.6px;
+  letter-spacing:0.14em;
+  color:var(--teal-hi);
+}
+
+.nav-arrow {
+  position:absolute;
+  top:154px;
+  width:26px; height:26px;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:color-mix(in srgb, var(--dark) 50%, transparent);
+  border:1px solid var(--line-d);
+  border-radius:50%;
+  color:var(--text-hi);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+  transition:background .2s ease, transform .15s ease;
+}
+.nav-arrow svg { width:13px; height:13px; }
+.nav-arrow:active { transform:scale(0.9); background:color-mix(in srgb, var(--accent) 55%, transparent); }
+#arrow-prev { left:10px; }
+#arrow-next { right:10px; }
+
+#bottom-fixed {
+  position:absolute;
+  left:0; right:0; bottom:0;
+  z-index:5;
+  padding:0 18px 11px;
+}
+
+#dots {
+  display:flex;
+  gap:6px;
+  margin-bottom:9px;
+}
+.dot {
+  width:14px; height:3px;
+  border-radius:2px;
+  background:var(--dot);
+  transition:background .3s ease, width .3s ease;
+  padding:6px 0;
+  background-clip:content-box;
+  box-sizing:content-box;
+}
+.dot.active { background-color:var(--gold); width:20px; }  /* background-color, not the shorthand: keeps background-clip */
+
+#stat-row {
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.stat { display:flex; flex-direction:column; gap:4px; }
+.stat-num {
+  font-family:var(--font-head);
+  font-weight:400;
+  font-size:22px;
+  line-height:1;
+  color:var(--white);
+  white-space:nowrap;
+}
+.stat-num em { font-style:normal; color:var(--accent-lt); }
+.stat-label {
+  font-family:var(--mono);
+  font-size:7px;
+  font-weight:500;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text-mid);
+  white-space:nowrap;
+}
+.stat-label .nc { text-transform:none; }  /* keep the company's own casing: aSAH */
+.stat-div { width:1px; height:28px; background:var(--line-d); }
+
+#cta {
+  margin-top:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  height:42px;
+  background:var(--accent-ink);
+  border-radius:8px;
+  color:var(--cta-ink);
+  font-family:var(--font);
+  font-weight:700;
+  font-size:12.5px;
+  letter-spacing:0.02em;
+  text-transform:none;
+  box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 34%, transparent);
+  transition:background .2s ease;
+  animation:cta-pulse 1.8s ease-in-out 2.6s 6;
+}
+#cta:hover { background:var(--accent-ink-d); }
+#cta .arw { font-family:var(--mono); font-weight:500; transition:transform .2s var(--ease); }
+#cta:hover .arw { transform:translateX(3px); }
+@keyframes cta-pulse {
+  0%, 100% { box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 34%, transparent); }
+  50%      { box-shadow:0 8px 28px color-mix(in srgb, var(--accent) 62%, transparent), 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent); }
+}
+
+/* Required disclosure line under the CTA */
+#disclosure {
+  margin-top:6px;
+  font-family:var(--mono);
+  font-size:6.6px;
+  letter-spacing:0.04em;
+  line-height:1.2;
+  text-align:center;
+  color:var(--text-hi);
+}
+
+/* ── Entrance sequence (initial load only) ─────────────────────── */
+.reveal {
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .7s var(--ease), transform .7s var(--ease);
+}
+#banner.is-live .reveal { opacity:1; transform:none; }
+#top-bar[data-delay="0"] { transition-delay:.05s; }
+#bottom-fixed[data-delay="4"] { transition-delay:.55s; }
+
+#click-tag-wrapper { position:absolute; width:0; height:0; overflow:hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .motif *, .slide.active .motif * { animation:none !important; }
+  .motif .bead { opacity:1; }
+  .motif .bead:nth-child(2) { transform:translateX(52px); }
+  .motif .bead:nth-child(3) { transform:translateX(104px); }
+  .motif .bead:nth-child(4) { transform:translateX(156px); }
+  #cta { animation:none; }
+  .reveal { transition-duration:.01s; transition-delay:0s !important; }
+  .slide, .slide-copy { transition-duration:.2s; }
+}
+
+
+/* ══ Concept C: sign-up block, appended to Concept A's stylesheet by
+   scripts/build_concept_c.py. Everything above this line is A's CSS,
+   copied verbatim; don't edit it here — edit A and rebuild. ══ */
+
+/* The sign-up is taller than A's CTA, so the chip and headline move up
+   by --c-lift, and the bottom padding tightens. If A has foreground art
+   in the slide background (a motif, a diagram) that now crowds the chip,
+   lift it too in the C-only block at the end of this file. */
+:root { --c-lift: 16px; --c-error: #ff7a6b; }
+.slide-copy .mid-chip, .slide-copy .copy-bottom { translate: 0 calc(-1 * var(--c-lift)); }
+#bottom-fixed { padding-bottom: 11px; }
+
+#signup { position:relative; margin-top:13px; cursor:default; }
+.sr-only {
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap;
+}
+#signup-row {
+  position:relative;
+  display:flex;
+  gap:6px;
+  height:40px;
+}
+#signup-email {
+  flex:1;
+  min-width:0;
+  height:100%;
+  padding:0 11px;
+  border:1px solid rgba(255,255,255,0.24);
+  border-radius:3px;
+  outline:0;
+  background:color-mix(in srgb, var(--dark) 55%, transparent);
+  color:var(--white, #fff);
+  font-family:var(--font);
+  font-size:11px;
+  font-weight:500;
+  transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+#signup-email::placeholder { color:rgba(255,255,255,0.6); }
+#signup-email:focus {
+  border-color:var(--accent);
+  background:color-mix(in srgb, var(--dark) 75%, transparent);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent);
+}
+#signup.is-error #signup-email { border-color:var(--c-error); animation:shake .35s ease; }
+@keyframes shake {
+  0%, 100% { transform:translateX(0); }
+  25% { transform:translateX(-4px); }
+  75% { transform:translateX(4px); }
+}
+/* Same fill, ink and type as A's CTA (--cta-ink), so C reads as A */
+#signup-btn {
+  flex:none;
+  height:100%;
+  padding:0 13px;
+  background:var(--accent);
+  border-radius:3px;
+  color:var(--cta-ink, var(--dark-2));
+  font-family:var(--font-head, var(--font));
+  font-weight:800;
+  font-size:11px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent);
+  transition:filter .2s ease, transform .15s ease;
+  animation:btn-pulse 1.8s ease-in-out 2.6s 6;
+}
+#signup-btn:hover { filter:brightness(1.08); }
+#signup-btn:active { transform:scale(0.96); }
+#signup.is-sending #signup-btn { opacity:0.6; pointer-events:none; }
+@keyframes btn-pulse {
+  0%, 100% { box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
+  50%      { box-shadow:0 8px 26px color-mix(in srgb, var(--accent) 60%, transparent); }
+}
+
+#signup-done {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  background:var(--accent);
+  border-radius:3px;
+  color:var(--cta-ink, var(--dark-2));
+  font-family:var(--font-head, var(--font));
+  font-weight:700;
+  font-size:11px;
+  opacity:0;
+  transform:scale(0.96);
+  pointer-events:none;
+  transition:opacity .35s var(--ease), transform .35s var(--ease);
+}
+#signup-done svg { width:15px; height:15px; flex:none; }
+#signup.is-done #signup-done { opacity:1; transform:none; }
+#signup.is-done #signup-email, #signup.is-done #signup-btn { visibility:hidden; }
+
+/* Consent and error share one two-line slot, so the error never moves
+   anything; the consent comes back as soon as the viewer types. */
+#signup-consent, #signup-msg {
+  margin-top:7px;
+  height:20px;
+  font-family:var(--font);
+  font-size:7px;
+  line-height:1.42;
+}
+#signup-consent { color:rgba(255,255,255,0.6); }
+#signup-consent a { color:inherit; text-decoration:underline; }
+#signup-msg {
+  display:none;
+  font-size:9px;
+  font-weight:600;
+  color:var(--c-error);
+}
+#signup.is-error #signup-consent { display:none; }
+#signup.is-error #signup-msg { display:block; }
+
+#fls-line {
+  margin-top:4px;
+  font-family:var(--mono);
+  font-size:6.6px;
+  letter-spacing:0.03em;
+  line-height:1.2;
+  text-align:center;
+  color:rgba(255,255,255,0.55);
+  white-space:nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #signup-btn { animation:none; }
+}
+
+/* A's CTA look, copied from its #cta rule by build_concept_c.py */
+#signup-btn {
+  background:var(--accent-ink);
+  color:var(--cta-ink);
+  font-family:var(--font);
+  font-weight:700;
+  letter-spacing:0.02em;
+  text-transform:none;
+  border-radius:8px;
+}
+#signup-done {
+  background:var(--accent-ink);
+  color:var(--cta-ink);
+  font-family:var(--font);
+  font-weight:700;
+  border-radius:8px;
+}
+
+/* ══ C-only overrides (kept on rebuild) ══ */
+/* Anything below this marker survives build_concept_c.py. Keep it to
+   small C-specific nudges, e.g. :root { --c-lift: 20px; } */
+/* Grace: the forward-looking line is two lines here (it names runway, NDA timing and the
+   investigational status), so C's content lifts 6px more to stay clear of it. */
+:root { --c-lift: 22px; }
+/* ...and the motif sits 6px higher so its last labels keep clear of the lifted chip. */
+.motif { translate: 0 -6px; }

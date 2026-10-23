@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="ad.size" content="width=300,height=600">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta name="viewport" content="width=300,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Grace Therapeutics, Inc. — Investor Relations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&amp;family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!--
+  Grace Therapeutics, Inc. — IR display banner, 300x600 — Concept D: Corporate site / brand-native.
+  Promotes: https://grace-therapeutics-ir-concept.netlify.app/
+  Styled from the company's own CORPORATE website (https://www.gracetx.com/), not the IR
+  landing page that Concepts A-C are built from: its white header + logo
+  lockup, heading/body fonts, palette, accent underline bars, button style
+  and footer strip. "Homepage in miniature": each slide is one module of the
+  corporate homepage, alternating photo and light grounds. This build uses:
+    1 hero slider -> 2 stats module -> 3 image + text split -> 4 overlay band.
+  Module classes (m-hero / m-stats / m-split / m-band) and the shared parts
+  (d-stat, d-list, d-arrows) live in style.css; every colour is a :root token
+  filled from brand.json "corp". Re-module a slide if the site has no such
+  module. Photos are the site's own photography, cropped into assets/;
+  assets/logo.svg is the site's own logo file. Every claim comes from the
+  project fact sheet (.tmp/facts.md).
+-->
+
+<div id="banner" aria-label="Grace Therapeutics, Inc. investor relations advertisement">
+
+  <div id="slides">
+
+    <!-- Slide 1 — Overview -->
+    <section class="slide m-hero" data-index="0">
+      <!-- Module: corporate homepage hero slider (.module.row-background-slider):
+           the homepage's brain-MRI photo + 40% black, gradient text panel, white Poppins title.
+           Facts: [HOME][IR] tagline, GTx-104 = IV nimodipine for aSAH; [HOME] ~50K; [GTX] ~$500M. -->
+      <img class="d-photo" src="assets/slide-1.jpg" alt="Hand pointing at a brain CT scan">
+      <div class="hero-panel">
+        <h2>Transforming the Treatment for an Acute Brain Injury</h2>
+        <p class="hero-desc"><span class="nw">GTx-104</span> is an investigational intravenous (IV) formulation of nimodipine being developed for aneurysmal subarachnoid hemorrhage (aSAH), a rare, <span class="nw">life-threatening</span> disease.</p>
+        <div class="d-stats">
+          <div class="d-stat">
+            <p class="d-value">~50K</p>
+            <p class="d-label">Cases per year in the U.S.</p>
+          </div>
+          <div class="d-stat">
+            <p class="d-value">~70%</p>
+            <p class="d-label">Death and dependency</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 2 — Proof -->
+    <section class="slide m-stats" data-index="1">
+      <!-- Module: corporate homepage "High Disease Burden" stats module (.module.module-stats):
+           navy Poppins values over teal bars, Roboto labels, on the page background.
+           Facts: [PR302][PR303][PR305] STRIVE-ON met its primary endpoint; 19% (28% vs 35%); 54% vs 8%; 29%. -->
+      <div class="stats-head">
+        <h2><span class="nw">STRIVE-ON</span> Met Its Primary Safety Endpoint</h2>
+        <p>Pivotal Phase 3 trial of <span class="nw">GTx-104</span> vs. oral nimodipine in patients hospitalized with aSAH. Not powered for statistical comparison.</p>
+      </div>
+      <div class="d-stats">
+        <div class="d-stat">
+          <p class="d-value">19%</p>
+          <p class="d-label">Relative reduction in patients with clinically significant hypotension (<span class="nw">GTx-104</span> 28% vs. oral 35%)</p>
+        </div>
+        <div class="d-stat">
+          <p class="d-value">54% <span class="d-vs">vs</span> 8%</p>
+          <p class="d-label">Patients with relative dose intensity of 95% or higher, <span class="nw">GTx-104</span> vs. oral</p>
+        </div>
+        <div class="d-stat">
+          <p class="d-value">50 <span class="d-vs">vs</span> 52</p>
+          <p class="d-label">Patients treated, <span class="nw">GTx-104</span> vs. oral (randomized, open-label)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3 — Platform -->
+    <section class="slide m-split" data-index="2">
+      <!-- Module: corporate homepage "GTx-104" image + text split (.module.row-default.content-bg-white),
+           stacked for portrait: the module's own nurse/patient photo over the white card,
+           navy h2 + teal bar, teal bullet dots, <hr>, teal-arrow sub-bullets.
+           Facts: matrix slide 3 (IV infusion vs up to 126 oral doses — derived 6/day x 21 days);
+           [HOME] every 4 hours for up to 21 days; [PR303] nanoparticle aqueous formulation;
+           [GTX] 100% vs 7.2% (Phase 1); [PR303] Orphan Drug Designation; [PR306] 52 patents. -->
+      <figure class="split-fig">
+        <img class="split-photo" src="assets/slide-3.jpg" alt="Illustrative image: nurse caring for a smiling patient in a hospital bed">
+        <figcaption>Illustrative image</figcaption>
+      </figure>
+      <div class="split-card">
+        <h2>IV Infusion vs. Oral Doses Every&nbsp;4&nbsp;Hours</h2>
+        <ul class="d-list">
+          <li>Standard of care is oral nimodipine every 4 hours for up to 21 days. <span class="nw">GTx-104</span> is being developed for IV infusion.</li>
+        </ul>
+        <hr class="d-rule">
+        <ul class="d-list">
+          <li>Nanoparticle technology enables an aqueous IV formulation of insoluble nimodipine.
+            <ul class="d-arrows">
+              <li>100% bioavailable vs. 7.2% oral (Phase 1)</li>
+              <li>FDA Orphan Drug Designation</li>
+              <li>52 granted &amp; pending patents</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Slide 4 — Catalyst & financials -->
+    <section class="slide m-band" data-index="3">
+      <!-- Module: corporate homepage "About" overlay band
+           (.module.row-default.background.overlay.dark): the band's own CT-scan photo under the
+           navy→teal overlay, centred white title and copy.
+           Facts: [PR303][PR305][PR307] CRL cited no clinical safety/efficacy deficiencies, planned NDA
+           resubmission (no date), dual-source manufacturing; [PR307] $22.2M cash at Aug 11 2026;
+           [PR306] $10M private placement; [PR306][PR307] expected runway to end of calendar 2028. -->
+      <img class="d-photo" src="assets/slide-4.jpg" alt="Brain MRI scans">
+      <div class="band-content">
+        <h2>Working Toward NDA Resubmission</h2>
+        <p class="band-desc">The FDA's Complete Response Letter cited manufacturing and non-clinical items, not clinical safety or efficacy, and requested no additional clinical data.</p>
+        <div class="d-stats">
+          <div class="d-stat">
+            <p class="d-value">$22.2M</p>
+            <p class="d-label">Cash &amp; equivalents, Aug&nbsp;11, 2026</p>
+          </div>
+          <div class="d-stat">
+            <p class="d-value">~$10M</p>
+            <p class="d-label">Gross private placement, announced Aug&nbsp;4</p>
+          </div>
+          <div class="d-stat">
+            <p class="d-value">2028</p>
+            <p class="d-label">Cash expected to fund planned operations through <span class="nw">year-end</span></p>
+          </div>
+        </div>
+        <p class="band-note"><span class="nw">Dual-source</span> manufacturing: tech transfer to a second, <span class="nw">U.S.-based</span> contract manufacturer is underway.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Persistent chrome — the corporate site's header, never rotates -->
+  <header id="top-bar" class="reveal" data-delay="0">
+    <img id="logo" src="assets/logo.svg" alt="Grace Therapeutics, Inc." width="128" height="28">
+    <span id="ticker">NASDAQ:&nbsp;GRCE</span>
+  </header>
+
+  <!-- Slider controls: round navy buttons, like the homepage slider's pause control -->
+  <button type="button" class="nav-arrow" id="arrow-prev" aria-label="Previous slide">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 6 8l4 5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button type="button" class="nav-arrow" id="arrow-next" aria-label="Next slide">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l4 5-4 5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <div id="bottom-fixed" class="reveal" data-delay="4">
+    <div id="dots" role="tablist" aria-label="Slide selector">
+      <button class="dot active" data-index="0" aria-label="Slide 1: Overview"></button>
+      <button class="dot" data-index="1" aria-label="Slide 2: Phase 3 results"></button>
+      <button class="dot" data-index="2" aria-label="Slide 3: GTx-104 formulation"></button>
+      <button class="dot" data-index="3" aria-label="Slide 4: Working toward NDA resubmission"></button>
+    </div>
+
+    <!-- The corporate site's .btn: radius/gradient border from brand.json corp, arrow after the label -->
+    <a href="#" id="cta">
+      <span>View Investor Relations</span>
+      <svg id="cta-arrow" viewBox="0 0 24 25" aria-hidden="true"><path d="M12 4.18066L10.585 5.59566L16.17 11.1807H4V13.1807H16.17L10.585 18.7657L12 20.1807L20 12.1807L12 4.18066Z"/></svg>
+    </a>
+
+    <!-- The corporate site's footer strip, carrying the required forward-looking-statements line -->
+    <p id="fls">Forward-looking statements, including on cash runway and NDA resubmission. GTx-104 is investigational and not FDA-approved. See SEC filings for risks.</p>
+  </div>
+
+  <!-- Standard HTML5-ad click-tag plumbing -->
+  <div id="click-tag-wrapper"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
